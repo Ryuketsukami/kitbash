@@ -1,0 +1,28 @@
+{
+  "name": "@kitbash/oauth",
+  "version": "0.1.0",
+  "description": "One sign-in API for Google, Apple, GitHub, LinkedIn and X — web redirect + native (Capacitor) system-browser flows, with a framework-agnostic server handler.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./server": { "types": "./dist/server/index.d.ts", "import": "./dist/server/index.js" }
+  },
+  "files": ["dist", "README.md"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "@capacitor/app": ">=6",
+    "@capacitor/browser": ">=6"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true },
+    "@capacitor/app": { "optional": true },
+    "@capacitor/browser": { "optional": true }
+  }
+}

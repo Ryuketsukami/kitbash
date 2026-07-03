@@ -1,0 +1,27 @@
+{
+  "name": "@kitbash/shop",
+  "version": "0.1.0",
+  "description": "RevenueCat-backed shop for React apps — offerings, subscriptions, entitlements, consumable tokens, cart, and a server webhook handler.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./server": { "types": "./dist/server/index.d.ts", "import": "./dist/server/index.js" }
+  },
+  "files": ["dist", "README.md"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "@revenuecat/purchases-capacitor": ">=9",
+    "@revenuecat/purchases-js": ">=1"
+  },
+  "peerDependenciesMeta": {
+    "@revenuecat/purchases-capacitor": { "optional": true },
+    "@revenuecat/purchases-js": { "optional": true }
+  }
+}
