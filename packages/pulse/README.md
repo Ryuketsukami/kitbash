@@ -87,9 +87,14 @@ Web Vitals (LCP/CLS/INP/FCP/TTFB), unhandled errors/rejections, and a
 session that caused them.
 
 **Client (React Native / anything without a DOM).** Same core, no provider
-needed — pass `platform`, an absolute `endpoint`, and call `screen()` yourself:
+needed — import from `@kitbash/pulse/client` (the SDK minus the React bindings;
+the package root re-exports the provider, so importing it needs `react`
+installed), pass `platform`, an absolute `endpoint`, and call `screen()`
+yourself:
 
 ```ts
+import { createPulse } from '@kitbash/pulse/client';
+
 const client = createPulse({ platform: 'ios', endpoint: 'https://api.myapp.com/pulse/ingest' });
 client.screen('Home');
 ```
@@ -202,6 +207,12 @@ last 24 h; span capped at 90 days), authenticated via `Authorization: Bearer
 
 One interface (`PulseStore`), three implementations — swapping is a one-line
 change and nothing else moves:
+
+```ts
+import { memoryStore } from '@kitbash/pulse/server';
+import { postgresStore } from '@kitbash/pulse/adapters/postgres';
+import { clickhouseStore } from '@kitbash/pulse/adapters/clickhouse';
+```
 
 - `memoryStore()` — zero-config dev default, capped ring buffer.
 - `postgresStore({ url?, poolSize?, timescale? })` — the default for real use;

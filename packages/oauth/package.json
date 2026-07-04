@@ -7,10 +7,12 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./client": { "types": "./dist/client.d.ts", "import": "./dist/client.js" },
     "./server": { "types": "./dist/server/index.d.ts", "import": "./dist/server/index.js" }
   },
   "files": ["dist", "README.md"],
   "sideEffects": false,
+  "engines": { "node": ">=20" },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"

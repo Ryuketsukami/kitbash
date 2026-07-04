@@ -10,7 +10,7 @@ datasources:
     jsonData:
       database: pulse
       sslmode: disable
-      postgresVersion: 1500
+      postgresVersion: 1700
       timescaledb: false
     secureJsonData:
       password: pulse-dev-password

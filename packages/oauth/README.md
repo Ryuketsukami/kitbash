@@ -19,6 +19,14 @@ function SignIn() {
 }
 ```
 
+No React? Import from `@kitbash/oauth/client` — same `createOAuthClient`, nothing
+in its module graph touches `react` (the package root re-exports `useOAuth`, so
+importing the root requires `react` to be installed):
+
+```ts
+import { createOAuthClient } from '@kitbash/oauth/client';
+```
+
 Next.js — `app/oauth/[...path]/route.ts`:
 
 ```ts
@@ -27,11 +35,14 @@ import { createOAuthServer } from '@kitbash/oauth/server';
 const oauth = createOAuthServer({
   onSignIn: async ({ profile }) => ({ sessionToken: await mintSession(profile) }),
 });
-export const GET = (r: Request) => oauth.fetch(r);
-export const POST = (r: Request) => oauth.fetch(r);
+const handler = async (req: Request) =>
+  (await oauth.fetch(req)) ?? new Response('not found', { status: 404 });
+export { handler as GET, handler as POST };
 ```
 
-Express: `app.use(oauth.toNodeHandler())`.
+Express: `app.use(oauth.toNodeHandler())` — mount it **before** `express.json()` or
+any other body parser: the handler reads its own raw request body
+(`POST /oauth/exchange`, Apple's `form_post` callback).
 
 Native (Capacitor): install `@capacitor/browser` + `@capacitor/app`, pass `appScheme`,
 and list the scheme (e.g. `myapp://`) in `KB_OAUTH_ALLOWED_REDIRECTS` — deep-link
@@ -63,6 +74,8 @@ Capacitor deep-links guide. `signIn()` resolves with `{ profile, sessionToken? }
 - Apple: iOS apps that offer other social logins **must** also offer Sign in with Apple
   (App Store Review 4.8). Apple sends the user's name only on first authorization.
 - Apple's callback is a cross-site `form_post`, so its state cookie is `SameSite=None`.
+- The state cookie is `Secure`: use **https** (or `localhost`) — on a plain-http host
+  the browser drops it and every callback fails with "State cookie missing".
 - X returns no email address; `profile.email` is always `undefined` for `x`.
 - The default one-time-code store is in-memory (single instance). Behind a load
   balancer, pass `otcStore` backed by Redis or similar.
