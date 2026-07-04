@@ -1,0 +1,16 @@
+apiVersion: 1
+
+datasources:
+  - name: Pulse Postgres
+    uid: pulse-pg
+    type: postgres
+    access: proxy
+    url: postgres:5432
+    user: pulse
+    jsonData:
+      database: pulse
+      sslmode: disable
+      postgresVersion: 1500
+      timescaledb: false
+    secureJsonData:
+      password: pulse-dev-password

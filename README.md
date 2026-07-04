@@ -40,6 +40,7 @@ npm i /path/to/kitbash/.tarballs/kitbash-onboarding-0.1.0.tgz
 packages/
   onboarding/   spotlight tours
   oauth/        multi-provider sign-in
+  pulse/        self-hosted telemetry + analytics
   shop/         RevenueCat purchases
   ship/         multi-platform build pipeline
 ```

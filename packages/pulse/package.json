@@ -1,0 +1,29 @@
+{
+  "name": "@kitbash/pulse",
+  "version": "0.1.0",
+  "description": "Self-hosted full-stack telemetry: client SDK, first-party collector, swappable Postgres/ClickHouse storage, and a drop-in dashboard — health, users and revenue with zero third-party calls.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./server": { "types": "./dist/server/index.d.ts", "import": "./dist/server/index.js" },
+    "./adapters/postgres": { "types": "./dist/adapters/postgres.d.ts", "import": "./dist/adapters/postgres.js" },
+    "./adapters/clickhouse": { "types": "./dist/adapters/clickhouse.d.ts", "import": "./dist/adapters/clickhouse.js" },
+    "./dashboard": { "types": "./dist/dashboard/index.d.ts", "import": "./dist/dashboard/index.js" }
+  },
+  "files": ["dist", "deploy", "README.md"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "pg": ">=8"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true },
+    "pg": { "optional": true }
+  }
+}

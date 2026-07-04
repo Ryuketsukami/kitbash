@@ -1,0 +1,65 @@
+# Backing services for @kitbash/pulse. The npm package ships the SDK, the
+# collector and the dashboard — the database is the one thing that runs as a
+# container (or bring your own).
+#
+#   docker compose up -d
+#   export KB_PULSE_DATABASE_URL=postgres://pulse:pulse-dev-password@localhost:5433/pulse
+#
+# Change pulse-dev-password everywhere before exposing anything beyond localhost.
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    # For TimescaleDB hypertables use: timescale/timescaledb:latest-pg17
+    # and pass { timescale: true } to postgresStore().
+    environment:
+      POSTGRES_DB: pulse
+      POSTGRES_USER: pulse
+      POSTGRES_PASSWORD: pulse-dev-password
+    ports:
+      - '5433:5432' # 5433 on the host to avoid clashing with a local Postgres
+    volumes:
+      - pulse-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U pulse -d pulse']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # -- High-volume alternative: ClickHouse ------------------------------------
+  # Uncomment (plus the volume below), then use clickhouseStore() with:
+  #   export KB_PULSE_CLICKHOUSE_URL=http://pulse:pulse-dev-password@localhost:8123/pulse
+  #
+  # clickhouse:
+  #   image: clickhouse/clickhouse-server:24.8-alpine
+  #   environment:
+  #     CLICKHOUSE_DB: pulse
+  #     CLICKHOUSE_USER: pulse
+  #     CLICKHOUSE_PASSWORD: pulse-dev-password
+  #   ports:
+  #     - '8123:8123'
+  #   volumes:
+  #     - pulse-ch-data:/var/lib/clickhouse
+  #   ulimits:
+  #     nofile:
+  #       soft: 262144
+  #       hard: 262144
+
+  # -- Optional: Grafana on the Postgres above --------------------------------
+  # Ships with the Pulse dashboard auto-provisioned (login admin/admin,
+  # http://localhost:3300). Uncomment to use:
+  #
+  # grafana:
+  #   image: grafana/grafana-oss:11.2.0
+  #   ports:
+  #     - '3300:3000'
+  #   volumes:
+  #     - ./grafana/provisioning:/etc/grafana/provisioning
+  #     - ./grafana/dashboards:/var/lib/grafana/dashboards
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
+volumes:
+  pulse-pg-data:
+  # pulse-ch-data:

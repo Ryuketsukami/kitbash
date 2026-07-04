@@ -4,6 +4,7 @@
 | --- | --- | --- |
 | [Onboarding](#onboarding) | `@kitbash/onboarding` | Spotlight tours: dim, highlight, guide |
 | [OAuth](#oauth) | `@kitbash/oauth` | Sign in with Google / Apple / GitHub / LinkedIn / X |
+| [Pulse](#pulse) | `@kitbash/pulse` | Self-hosted telemetry: health, funnels, revenue |
 | [Shop](#shop) | `@kitbash/shop` | RevenueCat products, subscriptions, tokens, cart |
 | [Ship](#ship) | `@kitbash/ship` | One React app → iOS, Android, Microsoft Store, web |
 
@@ -28,6 +29,19 @@ server-driven redirect flow; iOS/Android (Capacitor) use the system browser plus
 link back into the app. Ships a framework-agnostic server handler (Next / Nitro /
 Express) that owns the secrets, state + PKCE, token exchange, and profile
 normalization. Providers are configured via `KB_OAUTH_*` env vars.
+
+## Pulse
+
+`packages/pulse` — [README](packages/pulse/README.md)
+
+Self-hosted full-stack telemetry with zero third-party calls: a client SDK that
+auto-captures page views, Web Vitals and errors (plus `track()` for business
+events), a first-party collector that also times every backend request, and a
+mountable React dashboard covering traffic, latency percentiles, errors, vitals,
+funnels and revenue (ARPU, time-to-convert, payment cadence). Storage is
+pluggable — in-memory for dev, Postgres by default, ClickHouse for scale — with
+optional OTLP trace fan-out and a shipped Grafana dashboard. Server config via
+`KB_PULSE_*`.
 
 ## Shop
 
