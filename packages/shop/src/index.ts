@@ -7,6 +7,8 @@ export type {
   EntitlementState,
   CustomerState,
   PurchaseResult,
+  PaddleWebConfig,
+  PaddlePriceEntry,
 } from './types.js';
 export type { ShopAdapter } from './adapter.js';
 export {

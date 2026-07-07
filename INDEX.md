@@ -5,7 +5,7 @@
 | [Onboarding](#onboarding) | `@kitbash/onboarding` | Spotlight tours: dim, highlight, guide |
 | [OAuth](#oauth) | `@kitbash/oauth` | Sign in with Google / Apple / GitHub / LinkedIn / X |
 | [Pulse](#pulse) | `@kitbash/pulse` | Self-hosted telemetry: health, funnels, revenue |
-| [Shop](#shop) | `@kitbash/shop` | RevenueCat products, subscriptions, tokens, cart |
+| [Shop](#shop) | `@kitbash/shop` | RevenueCat + Paddle: subscriptions, tokens, cart |
 | [Ship](#ship) | `@kitbash/ship` | One React app → iOS, Android, Microsoft Store, web |
 
 ---
@@ -47,10 +47,11 @@ optional OTLP trace fan-out and a shipped Grafana dashboard. Server config via
 
 `packages/shop` — [README](packages/shop/README.md)
 
-Everything purchasable behind one API, backed by RevenueCat: offerings, subscriptions,
-entitlements, consumable tokens, restore, and a light cart. Native builds use the
-RevenueCat Capacitor SDK; the web uses RevenueCat Web Billing. Includes a webhook
-handler for server-side token crediting. Keys and webhook auth via `KB_SHOP_*`.
+Everything purchasable behind one API: offerings, subscriptions, entitlements,
+consumable tokens, restore, and a light cart. Native builds use the RevenueCat
+Capacitor SDK; web checkout runs through the Paddle overlay, with RevenueCat
+ingesting Paddle purchases so entitlements stay unified across platforms. Includes
+a webhook handler for server-side token crediting. Webhook auth via `KB_SHOP_*`.
 
 ## Ship
 

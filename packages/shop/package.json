@@ -1,7 +1,7 @@
 {
   "name": "@kitbash/shop",
-  "version": "0.1.0",
-  "description": "RevenueCat-backed shop for React apps — offerings, subscriptions, entitlements, consumable tokens, cart, and a server webhook handler.",
+  "version": "0.2.0",
+  "description": "Shop for React apps — native stores via RevenueCat, web checkout via Paddle; offerings, subscriptions, entitlements, consumable tokens, cart, and a server webhook handler.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

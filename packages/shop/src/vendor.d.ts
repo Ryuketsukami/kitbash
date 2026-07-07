@@ -15,10 +15,10 @@ declare module '@revenuecat/purchases-capacitor' {
   };
 }
 
+// Read-only on web since the Paddle migration: checkout goes through the
+// Paddle.js overlay, purchases-js only fetches customer info / entitlements.
 declare module '@revenuecat/purchases-js' {
   export interface PurchasesJsInstance {
-    getOfferings(): Promise<unknown>;
-    purchase(params: { rcPackage: unknown }): Promise<unknown>;
     getCustomerInfo(): Promise<unknown>;
   }
   export const Purchases: {
