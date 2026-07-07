@@ -9,7 +9,12 @@ export type {
   PurchaseResult,
   PaddleWebConfig,
   PaddlePriceEntry,
+  FreemiusWebConfig,
+  FreemiusPlanEntry,
+  FreemiusBillingCycle,
 } from './types.js';
+export { openFreemiusCheckout, freemiusOfferings } from './adapters/freemius.js';
+export type { FreemiusCheckoutInput, FreemiusCheckoutResult } from './adapters/freemius.js';
 export type { ShopAdapter } from './adapter.js';
 export {
   initShop,

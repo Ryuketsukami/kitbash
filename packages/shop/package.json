@@ -1,19 +1,25 @@
 {
   "name": "@kitbash/shop",
-  "version": "0.2.0",
-  "description": "Shop for React apps — native stores via RevenueCat, web checkout via Paddle; offerings, subscriptions, entitlements, consumable tokens, cart, and a server webhook handler.",
+  "version": "0.3.0",
+  "description": "Shop for React apps — native stores via RevenueCat, web checkout via Paddle or Freemius; offerings, subscriptions, entitlements, consumable tokens, cart, and server webhook/bridge handlers.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-    "./server": { "types": "./dist/server/index.d.ts", "import": "./dist/server/index.js" }
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./server": { "types": "./dist/server/index.d.ts", "default": "./dist/server/index.js" }
+  },
+  "typesVersions": {
+    "*": {
+      "server": ["./dist/server/index.d.ts"]
+    }
   },
   "files": ["dist", "README.md"],
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
   },
   "peerDependencies": {
     "react": ">=18",

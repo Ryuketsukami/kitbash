@@ -9,6 +9,12 @@ checkout runs through the **Paddle** overlay — RevenueCat ingests Paddle
 purchases, so entitlements stay unified across every platform and your server
 still listens to exactly one webhook (RevenueCat's).
 
+If Paddle won't onboard your product, the web rail can run on **Freemius**
+instead (also a merchant of record): same `purchase(pkg)` API, checkout in the
+Freemius overlay, and your server bridges Freemius webhooks into RevenueCat
+promotional entitlements so RevenueCat stays the single entitlement brain. See
+"Freemius web checkout" below.
+
 ## Wire
 
 Init + provider (client keys come from your app config, see Env vars):
@@ -129,11 +135,83 @@ export const POST = hook.fetch;
 app.post('/rc-webhook', hook.toNodeHandler());
 ```
 
+## Freemius web checkout (alternative rail)
+
+Configure `freemius` instead of `paddle` (exactly one). Freemius has no client
+price API, so plan display data lives in config; `userEmail` prefills the
+overlay read-only so the webhook can attribute the buyer:
+
+```tsx
+<ShopProvider
+  config={{
+    apiKeys: { ios: IOS_KEY, android: ANDROID_KEY, web: RC_WEB_KEY },
+    appUserId: user.id,
+    userEmail: user.email,
+    freemius: {
+      productId: FREEMIUS_PRODUCT_ID,
+      publicKey: FREEMIUS_PUBLIC_KEY, // pk_…, browser-safe
+      plans: [
+        { planId: 111, kind: 'subscription', billingCycle: 'monthly', title: 'Pro', priceFormatted: '$9.99' },
+        { planId: 222, kind: 'consumable', billingCycle: 'lifetime', title: '100 tokens', priceFormatted: '$4.99' },
+      ],
+    },
+  }}
+>
+```
+
+Or piecemeal, without the provider: `openFreemiusCheckout({ productId, planId,
+billingCycle, email })` resolves ok on `purchaseCompleted`, cancelled if the
+buyer closes the overlay first.
+
+Unlike Paddle, RevenueCat has no native Freemius ingestion — your server is
+the bridge. Verify + parse the Freemius webhook, then grant/revoke RevenueCat
+**promotional entitlements** (time-boxed to the license expiration + slack, so
+a missed cancellation fails closed):
+
+```ts
+import { createFreemiusWebhook, createRcAdmin } from '@kitbash/shop/server';
+
+const rc = createRcAdmin({ secretKey: process.env.KB_SHOP_RC_SECRET });
+const hook = createFreemiusWebhook({
+  productId: FREEMIUS_PRODUCT_ID,
+  onEvent: async (evt) => {
+    const user = await users.byEmail(evt.email); // your identity join
+    if (!user) return;
+    if (evt.type === 'license.created' || evt.type === 'license.extended') {
+      await rc.grantEntitlement({
+        appUserId: user.id,
+        entitlementId: planToEntitlement[evt.planId!],
+        endTimeMs: (evt.expirationMs ?? Date.now() + 32 * 86_400_000) + 86_400_000,
+      });
+    }
+    if (evt.type === 'license.expired' || evt.type === 'license.cancelled') {
+      await rc.revokeEntitlement({ appUserId: user.id, entitlementId: planToEntitlement[evt.planId!] });
+    }
+  },
+});
+export const POST = hook.fetch; // or app.post('/freemius-webhook', hook.toNodeHandler())
+```
+
+Throwing inside `onEvent` returns 500 so Freemius retries; RevenueCat treats a
+re-grant within 2h of the active expiration as a duplicate, so retries are
+safe. As a safety net, run `planReconciliation` nightly with
+`createFreemiusApi(…).listLicenses()/listUsers()` (product-scoped token) to
+re-issue live grants and revoke vanished ones — a lost webhook then heals
+within a day. Token packs should bypass RevenueCat entirely: credit your own
+ledger from `payment.created`, idempotent by `evt.paymentId`.
+
+There is also an official `@freemius/sdk` (early, v0.x) if you'd rather call
+Freemius' API through their own client; this package intentionally hand-rolls
+the few calls it needs so the server half stays dependency-free and edge-safe.
+
 ## Env vars
 
 | Var | Where | Purpose |
 | --- | --- | --- |
 | `KB_SHOP_RC_WEBHOOK_AUTH` | server (secret) | Expected `Authorization` header value for the RevenueCat webhook. |
+| `KB_SHOP_FREEMIUS_SECRET` | server (secret) | Freemius product **secret key** — verifies webhook `x-signature`. |
+| `KB_SHOP_FREEMIUS_API_TOKEN` | server (secret) | Product-scoped Freemius API bearer token (reconciliation reads). |
+| `KB_SHOP_RC_SECRET` | server (secret) | RevenueCat **secret** API key — grants/revokes promotional entitlements. |
 
 Client keys are not read from env by this package — pass them into `ShopConfig`
 from your app's own env, e.g. `VITE_KB_SHOP_RC_KEY_WEB` / `_IOS` / `_ANDROID`
